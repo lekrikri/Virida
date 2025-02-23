@@ -54,6 +54,14 @@ export interface ResourceUsage {
   timestamp: string;
 }
 
+export interface AutomationRule {
+  id: string;
+  name: string;
+  condition: string;
+  action: string;
+  enabled: boolean;
+}
+
 // Sample Users
 export const mockUsers: User[] = [
   {
@@ -379,6 +387,38 @@ export const mockZones: Zone[] = [
     position: [2.5, 0, 0],
     dimensions: [5, 4, 5]
   }
+];
+
+// Sample Automation Rules
+export const mockAutomationRules: AutomationRule[] = [
+  {
+    id: '1',
+    name: 'Temperature Control',
+    condition: 'Temperature > 25°C',
+    action: 'Activate cooling system',
+    enabled: true,
+  },
+  {
+    id: '2',
+    name: 'Humidity Control',
+    condition: 'Humidity < 60%',
+    action: 'Activate misting system',
+    enabled: true,
+  },
+  {
+    id: '3',
+    name: 'CO2 Control',
+    condition: 'CO2 > 1000ppm',
+    action: 'Activate ventilation',
+    enabled: true,
+  },
+  {
+    id: '4',
+    name: 'Light Control',
+    condition: 'Light < 40%',
+    action: 'Activate grow lights',
+    enabled: true,
+  },
 ];
 
 // Helper function to generate random historical data

@@ -4,7 +4,6 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { useViridaStore } from '../../store/useViridaStore';
-import { useThree } from '../../hooks/useThree';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import Co2Icon from '@mui/icons-material/Co2';
@@ -43,24 +42,78 @@ const SensorTooltip = styled(Paper)(({ theme }) => ({
   pointerEvents: 'none',
 }));
 
+// Composant pour la scène 3D
+const Scene = () => {
+  const { sensors, zones } = useViridaStore();
+  const [hoveredSensor, setHoveredSensor] = useState<any>(null);
+
+  // Créer les géométries des capteurs
+  const sensorGeometries = {
+    temperature: new THREE.SphereGeometry(0.2),
+    humidity: new THREE.BoxGeometry(0.3, 0.3, 0.3),
+    co2: new THREE.CylinderGeometry(0.15, 0.15, 0.4),
+    light: new THREE.ConeGeometry(0.2, 0.4),
+  };
+
+  // Créer les matériaux des capteurs
+  const sensorMaterials = {
+    temperature: new THREE.MeshStandardMaterial({ color: '#e74c3c' }),
+    humidity: new THREE.MeshStandardMaterial({ color: '#3498db' }),
+    co2: new THREE.MeshStandardMaterial({ color: '#2ecc71' }),
+    light: new THREE.MeshStandardMaterial({ color: '#f1c40f' }),
+  };
+
+  return (
+    <>
+      <PerspectiveCamera makeDefault position={[0, 5, 10]} />
+      <OrbitControls enableDamping dampingFactor={0.05} />
+      
+      {/* Ambient Light */}
+      <ambientLight intensity={0.5} />
+      
+      {/* Directional Light */}
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+      
+      {/* Greenhouse Base */}
+      <mesh position={[0, -0.5, 0]} receiveShadow>
+        <boxGeometry args={[10, 0.1, 10]} />
+        <meshStandardMaterial color="#2c3e50" />
+      </mesh>
+
+      {/* Greenhouse Walls */}
+      <mesh position={[0, 2, 0]}>
+        <boxGeometry args={[10, 4, 10]} />
+        <meshStandardMaterial color="#34495e" transparent opacity={0.3} />
+      </mesh>
+      
+      {/* Sensors */}
+      {sensors.map((sensor, index) => (
+        <mesh
+          key={sensor.id}
+          position={sensor.position}
+          geometry={sensorGeometries[sensor.type as keyof typeof sensorGeometries]}
+          material={sensorMaterials[sensor.type as keyof typeof sensorMaterials]}
+          onPointerOver={() => setHoveredSensor(sensor)}
+          onPointerOut={() => setHoveredSensor(null)}
+        />
+      ))}
+
+      {/* Zones */}
+      {zones.map((zone) => (
+        <mesh key={zone.id} position={zone.position}>
+          <boxGeometry args={zone.dimensions} />
+          <meshStandardMaterial color="#27ae60" transparent opacity={0.1} />
+        </mesh>
+      ))}
+    </>
+  );
+};
+
 const MonitoringView: React.FC = () => {
   const { sensors, zones, selectedZone, setSelectedZone } = useViridaStore();
   const [hoveredSensor, setHoveredSensor] = useState<any>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const {
-    greenhouseModel,
-    sensorModels,
-    updateSensorPositions,
-    handleSensorClick,
-    handleSensorHover,
-  } = useThree();
-
-  useEffect(() => {
-    // Update sensor positions when sensors or zones change
-    updateSensorPositions(sensors, zones);
-  }, [sensors, zones, updateSensorPositions]);
 
   const handleMouseMove = (event: React.MouseEvent) => {
     setMousePosition({
@@ -82,30 +135,7 @@ const MonitoringView: React.FC = () => {
 
       <StyledBox onMouseMove={handleMouseMove}>
         <Canvas ref={canvasRef}>
-          <PerspectiveCamera makeDefault position={[0, 5, 10]} />
-          <OrbitControls enableDamping dampingFactor={0.05} />
-          
-          {/* Ambient Light */}
-          <ambientLight intensity={0.5} />
-          
-          {/* Directional Light */}
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-          
-          {/* Greenhouse Model */}
-          {greenhouseModel}
-          
-          {/* Sensor Models */}
-          {sensorModels.map((model, index) => (
-            <group
-              key={index}
-              position={model.position}
-              onClick={() => handleSensorClick(index)}
-              onPointerOver={() => handleSensorHover(index)}
-              onPointerOut={() => setHoveredSensor(null)}
-            >
-              {model.mesh}
-            </group>
-          ))}
+          <Scene />
         </Canvas>
 
         {/* Info Panel */}

@@ -27,59 +27,43 @@ const AutomationRules: React.FC = () => {
   const { automationRules, toggleAutomationRule } = useViridaStore();
 
   return (
-    <StyledCard>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Automation Rules
-        </Typography>
-        <List>
-          {automationRules.map((rule) => (
-            <ListItem
-              key={rule.id}
-              sx={{
-                borderBottom: '1px solid rgba(46, 204, 113, 0.1)',
-                '&:last-child': { borderBottom: 'none' },
-              }}
-            >
-              <ListItemText
-                primary={rule.name}
-                secondary={
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      If: {rule.condition}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Then: {rule.action}
-                    </Typography>
-                  </Box>
-                }
-              />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  size="small"
-                  sx={{ color: 'primary.main', mr: 1 }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  edge="end"
-                  size="small"
-                  sx={{ color: 'error.main', mr: 1 }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <Switch
-                  checked={rule.enabled}
-                  onChange={() => toggleAutomationRule(rule.id)}
-                  color="primary"
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-      </CardContent>
-    </StyledCard>
+    <Box p={3}>
+      <Typography variant="h4" gutterBottom>
+        Automation Rules
+      </Typography>
+      <List>
+        {automationRules.map((rule) => (
+          <StyledCard key={rule.id}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6">{rule.name}</Typography>
+                <Box>
+                  <Switch
+                    checked={rule.enabled}
+                    onChange={() => toggleAutomationRule(rule.id)}
+                    color="primary"
+                  />
+                  <IconButton size="small">
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton size="small">
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+              <Box mt={1}>
+                <Typography variant="body2" color="text.secondary">
+                  Condition: {rule.condition}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Action: {rule.action}
+                </Typography>
+              </Box>
+            </CardContent>
+          </StyledCard>
+        ))}
+      </List>
+    </Box>
   );
 };
 
