@@ -35,16 +35,16 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  background: 'rgba(17, 34, 64, 0.7)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   height: '100%',
 }));
 
 const MetricCard = styled(Card)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   height: '100%',
 }));
 

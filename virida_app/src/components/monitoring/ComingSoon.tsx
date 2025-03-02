@@ -10,9 +10,9 @@ import UpdateIcon from '@mui/icons-material/Update';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  background: 'rgba(17, 34, 64, 0.7)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   padding: theme.spacing(4),
   display: 'flex',
   flexDirection: 'column',

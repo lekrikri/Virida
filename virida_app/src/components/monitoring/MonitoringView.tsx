@@ -14,10 +14,10 @@ const StyledBox = styled(Box)(({ theme }) => ({
   width: '100%',
   height: 'calc(100vh - 100px)',
   position: 'relative',
-  backgroundColor: 'rgba(17, 34, 64, 0.7)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   borderRadius: theme.shape.borderRadius,
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
 }));
 
 const InfoPanel = styled(Paper)(({ theme }) => ({
@@ -25,9 +25,9 @@ const InfoPanel = styled(Paper)(({ theme }) => ({
   top: theme.spacing(2),
   right: theme.spacing(2),
   padding: theme.spacing(2),
-  background: 'rgba(17, 34, 64, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
   zIndex: 1000,
   maxWidth: 300,
 }));
@@ -35,9 +35,9 @@ const InfoPanel = styled(Paper)(({ theme }) => ({
 const SensorTooltip = styled(Paper)(({ theme }) => ({
   position: 'absolute',
   padding: theme.spacing(1),
-  background: 'rgba(17, 34, 64, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
   zIndex: 1000,
   pointerEvents: 'none',
 }));
@@ -77,13 +77,13 @@ const Scene = () => {
       {/* Greenhouse Base */}
       <mesh position={[0, -0.5, 0]} receiveShadow>
         <boxGeometry args={[10, 0.1, 10]} />
-        <meshStandardMaterial color="#2c3e50" />
+        <meshStandardMaterial color="#f5f5f5" />
       </mesh>
 
       {/* Greenhouse Walls */}
       <mesh position={[0, 2, 0]}>
         <boxGeometry args={[10, 4, 10]} />
-        <meshStandardMaterial color="#34495e" transparent opacity={0.3} />
+        <meshStandardMaterial color="#f5f5f5" transparent opacity={0.3} />
       </mesh>
       
       {/* Sensors */}
@@ -102,7 +102,7 @@ const Scene = () => {
       {zones.map((zone) => (
         <mesh key={zone.id} position={zone.position}>
           <boxGeometry args={zone.dimensions} />
-          <meshStandardMaterial color="#27ae60" transparent opacity={0.1} />
+          <meshStandardMaterial color="#2AD388" transparent opacity={0.1} />
         </mesh>
       ))}
     </>
@@ -125,9 +125,9 @@ const MonitoringView: React.FC = () => {
   return (
     <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Monitoring 3D</Typography>
+        <Typography variant="h4" color="#121A21">Monitoring 3D</Typography>
         <Box display="flex" alignItems="center" gap={2}>
-          <IconButton onClick={() => window.location.reload()}>
+          <IconButton onClick={() => window.location.reload()} sx={{ color: '#2AD388' }}>
             <RefreshIcon />
           </IconButton>
         </Box>
@@ -140,37 +140,37 @@ const MonitoringView: React.FC = () => {
 
         {/* Info Panel */}
         <InfoPanel>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom color="#121A21">
             Zone Information
           </Typography>
           <Box display="flex" flexDirection="column" gap={2}>
             <Box display="flex" alignItems="center" gap={1}>
-              <ThermostatIcon />
-              <Typography>
+              <ThermostatIcon sx={{ color: '#2AD388' }} />
+              <Typography color="#121A21">
                 Temperature: {sensors[0]?.value.toFixed(1)}°C
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
-              <OpacityIcon />
-              <Typography>
+              <OpacityIcon sx={{ color: '#2AD388' }} />
+              <Typography color="#121A21">
                 Humidity: {sensors[1]?.value.toFixed(1)}%
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
-              <Co2Icon />
-              <Typography>
+              <Co2Icon sx={{ color: '#2AD388' }} />
+              <Typography color="#121A21">
                 CO2: {sensors[2]?.value.toFixed(0)} ppm
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
-              <LightModeIcon />
-              <Typography>
+              <LightModeIcon sx={{ color: '#2AD388' }} />
+              <Typography color="#121A21">
                 Light: {sensors[3]?.value.toFixed(1)}%
               </Typography>
             </Box>
           </Box>
           <Box mt={2}>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle2" gutterBottom color="#121A21">
               Active Zones
             </Typography>
             <Box display="flex" gap={1} flexWrap="wrap">
@@ -181,6 +181,10 @@ const MonitoringView: React.FC = () => {
                   onClick={() => setSelectedZone(zone.id)}
                   color={selectedZone === zone.id ? 'primary' : 'default'}
                   size="small"
+                  sx={{
+                    backgroundColor: selectedZone === zone.id ? '#2AD388' : '#f5f5f5',
+                    color: selectedZone === zone.id ? '#FFFFFF' : '#121A21',
+                  }}
                 />
               ))}
             </Box>
@@ -195,14 +199,14 @@ const MonitoringView: React.FC = () => {
               top: mousePosition.y + 10,
             }}
           >
-            <Typography variant="subtitle2">
+            <Typography variant="subtitle2" color="#121A21">
               {hoveredSensor.name}
             </Typography>
-            <Typography variant="body2">
-              {hoveredSensor.value.toFixed(1)} {hoveredSensor.unit}
+            <Typography variant="body2" color="#121A21">
+              Type: {hoveredSensor.type}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Last updated: {new Date().toLocaleTimeString()}
+            <Typography variant="body2" color="#121A21">
+              Value: {hoveredSensor.value.toFixed(1)} {hoveredSensor.unit}
             </Typography>
           </SensorTooltip>
         )}

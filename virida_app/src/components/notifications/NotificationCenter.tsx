@@ -17,8 +17,8 @@ import { useViridaStore } from '../../store/useViridaStore';
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: 320,
-    background: 'rgba(17, 34, 64, 0.95)',
-    backdropFilter: 'blur(10px)',
+    background: '#FFFFFF',
+    boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)',
     border: 'none',
   },
 }));
@@ -29,12 +29,14 @@ const NotificationItem = styled(ListItem)<{ type: string }>(({ theme, type }) =>
       ? theme.palette.error.main
       : type === 'warning'
       ? theme.palette.warning.main
-      : theme.palette.primary.main
+      : '#2AD388'
   }`,
   margin: '8px 0',
-  background: 'rgba(255, 255, 255, 0.05)',
+  background: '#FFFFFF',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   '&:hover': {
-    background: 'rgba(255, 255, 255, 0.1)',
+    background: '#F5F5F5',
   },
 }));
 

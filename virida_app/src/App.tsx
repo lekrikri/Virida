@@ -56,7 +56,7 @@ function App() {
       <Box sx={{ 
         display: 'flex',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a192f 0%, #112240 100%)',
+        background: '#FFFFFF',
       }}>
         <Sidebar
           open={sidebarOpen}

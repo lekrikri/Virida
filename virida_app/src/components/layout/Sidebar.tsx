@@ -23,10 +23,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
-    background: 'rgba(17, 34, 64, 0.95)',
-    backdropFilter: 'blur(10px)',
+    background: '#2AD388',
     border: 'none',
-    borderRight: '1px solid rgba(46, 204, 113, 0.1)',
     width: 240,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -38,9 +36,9 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 const StyledListItem = styled(ListItem)<{ active?: boolean }>(({ theme, active }) => ({
   margin: '8px 16px',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: active ? 'rgba(46, 204, 113, 0.1)' : 'transparent',
+  backgroundColor: active ? 'rgba(5, 46, 28, 0.2)' : 'transparent',
   '&:hover': {
-    backgroundColor: 'rgba(46, 204, 113, 0.05)',
+    backgroundColor: 'rgba(5, 46, 28, 0.1)',
   },
 }));
 
@@ -94,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           p: 2,
         }}
       >
-        <IconButton onClick={onToggle} sx={{ color: 'primary.main' }}>
+        <IconButton onClick={onToggle} sx={{ color: '#121A21' }}>
           <MenuIcon />
         </IconButton>
       </Box>
@@ -114,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <ListItemIcon
                 sx={{
                   minWidth: open ? 36 : 'auto',
-                  color: currentView === item.id ? 'primary.main' : 'text.secondary',
+                  color: currentView === item.id ? '#121A21' : 'rgba(18, 26, 33, 0.7)',
                 }}
               >
                 {item.icon}
@@ -124,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   primary={item.label}
                   sx={{
                     color:
-                      currentView === item.id ? 'primary.main' : 'text.primary',
+                      currentView === item.id ? '#121A21' : 'rgba(18, 26, 33, 0.7)',
                   }}
                 />
               )}

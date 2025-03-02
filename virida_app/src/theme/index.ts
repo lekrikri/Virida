@@ -2,31 +2,30 @@ import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     primary: {
-      main: '#27ae60',
-      light: '#2ecc71',
-      dark: '#219a52',
+      main: '#2AD388',
+      light: '#CBED82',
+      dark: '#052E1C',
     },
     secondary: {
-      main: '#2ecc71',
+      main: '#CBED82',
     },
     background: {
-      default: '#0a192f',
-      paper: '#112240',
+      default: '#FFFFFF',
+      paper: '#FFFFFF',
     },
     text: {
-      primary: '#e6f1ff',
-      secondary: '#8892b0',
+      primary: '#121A21',
+      secondary: '#121A21',
     },
   },
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
-          background: 'rgba(17, 34, 64, 0.7)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(46, 204, 113, 0.1)',
+          background: '#FFFFFF',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
           borderRadius: 16,
         },
       },
@@ -34,8 +33,31 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          background: 'rgba(17, 34, 64, 0.7)',
-          backdropFilter: 'blur(10px)',
+          background: '#FFFFFF',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: '#FFFFFF',
+          color: '#121A21',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        containedPrimary: {
+          backgroundColor: '#052E1C',
+          color: '#FFFFFF',
+          '&:hover': {
+            backgroundColor: '#041E13',
+          },
+        },
+        outlinedPrimary: {
+          borderColor: '#2AD388',
+          color: '#2AD388',
         },
       },
     },
@@ -45,15 +67,15 @@ const theme = createTheme({
     h1: {
       fontSize: '2.5rem',
       fontWeight: 600,
-      color: '#e6f1ff',
+      color: '#121A21',
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 600,
-      color: '#e6f1ff',
+      color: '#121A21',
     },
     h6: {
-      color: '#27ae60',
+      color: '#2AD388',
       fontWeight: 500,
     },
   },

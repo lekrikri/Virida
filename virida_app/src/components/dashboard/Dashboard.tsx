@@ -5,21 +5,12 @@ import GreenhouseModel from '../3d/GreenhouseModel';
 import SensorCard from './SensorCard';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  background: 'rgba(17, 34, 64, 0.7)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(46, 204, 113, 0.1)',
+  background: '#FFFFFF',
+  border: '1px solid rgba(0, 0, 0, 0.1)',
   borderRadius: theme.shape.borderRadius,
   overflow: 'hidden',
   position: 'relative',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '2px',
-    background: 'linear-gradient(90deg, #27ae60, #2ecc71)',
-  },
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
 }));
 
 const GridOverlay = styled(Box)(({ theme }) => ({
@@ -29,8 +20,8 @@ const GridOverlay = styled(Box)(({ theme }) => ({
   right: 0,
   bottom: 0,
   background: `
-    linear-gradient(90deg, rgba(46, 204, 113, 0.03) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(46, 204, 113, 0.03) 1px, transparent 1px)
+    linear-gradient(90deg, rgba(42, 211, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(42, 211, 136, 0.03) 1px, transparent 1px)
   `,
   backgroundSize: '20px 20px',
   pointerEvents: 'none',
@@ -45,11 +36,11 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, minHeight: '100vh', position: 'relative' }}>
+    <Box sx={{ p: 3, minHeight: '100vh', position: 'relative', background: '#FFFFFF' }}>
       <GridOverlay />
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{ mb: 3, color: 'primary.main' }}>
+          <Typography variant="h4" sx={{ mb: 3, color: '#121A21' }}>
             Greenhouse Monitor
           </Typography>
         </Grid>
