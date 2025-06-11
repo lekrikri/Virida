@@ -18,68 +18,60 @@ const VIRIDA_COLORS = {
 const serreModelPath = new URL('./Serre_max.gltf', import.meta.url).href;
 
 const SerreModel = () => {
-  const { scene } = useGLTF(serreModelPath);
+  const { scene, materials } = useGLTF(serreModelPath);
   
   useEffect(() => {
     // Configuration pour les reflets
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(1, 1); // Taille minimale pour éviter les erreurs
     
-    // Ajuster les matériaux si nécessaire
+    // Appliquer l'effet plexiglas/verre uniquement au matériau spécifique
+    if (materials && materials['0.917647_0.917647_0.917647_0.000000_0.800000']) {
+      const glassMaterial = materials['0.917647_0.917647_0.917647_0.000000_0.800000'];
+      
+      // Appliquer l'effet plexiglas/verre
+      glassMaterial.transparent = true;
+      glassMaterial.opacity = 0.40; // Très transparent
+      
+      // Appliquer des propriétés spécifiques selon le type de matériau
+      if (glassMaterial instanceof THREE.MeshStandardMaterial) {
+        glassMaterial.roughness = 0.05; // Très lisse
+        glassMaterial.metalness = 0.2; // Légèrement métallique
+        glassMaterial.envMapIntensity = 1.8; // Intensifier les reflets
+        
+        // Ajouter une légère teinte bleutée pour l'effet verre
+        const glassColor = new THREE.Color(0xc4e0f9); // Bleu très pâle
+        glassMaterial.color.lerp(glassColor, 0.5); // Mélanger avec la couleur existante
+      }
+      
+      if (glassMaterial instanceof THREE.MeshPhongMaterial) {
+        glassMaterial.shininess = 100;
+        glassMaterial.specular = new THREE.Color(0xffffff);
+        
+        // Ajouter une légère teinte bleutée pour l'effet verre si c'est un matériau Phong
+        // Vérification de type plus précise pour éviter l'erreur TypeScript
+        if ('color' in glassMaterial && glassMaterial.color instanceof THREE.Color) {
+          const glassColor = new THREE.Color(0xc4e0f9); // Bleu très pâle
+          glassMaterial.color.lerp(glassColor, 0.5); // Mélanger avec la couleur existante
+        }
+      }
+    }
+    
+    // Parcourir la scène pour s'assurer que tous les matériaux sont correctement configurés
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        // Fonction pour appliquer l'effet plexiglas/verre aux matériaux marron/mauves
-        const applyGlassEffect = (material: THREE.Material) => {
-          // Vérifier si c'est un matériau avec couleur
-          if ('color' in material && material.color instanceof THREE.Color) {
-            const color = material.color;
-            
-            // Détecter les couleurs marron/mauves (valeurs ajustées pour le modèle)
-            // Valeurs RGB pour les tons marron/mauve
-            const isBrownOrPurple = (
-              // Détection plus large des tons marron/mauve
-              (color.r > 0.3 && color.g < 0.3 && color.b < 0.3) || // Marron
-              (color.r > 0.2 && color.g < 0.2 && color.b > 0.2) || // Mauve
-              (color.r > 0.3 && color.g > 0.2 && color.g < 0.5 && color.b < 0.4) // Marron clair
-            );
-            
-            if (isBrownOrPurple) {
-              // Appliquer l'effet plexiglas/verre
-              material.transparent = true;
-              material.opacity = 0.12; // Extrêmement transparent
-              
-              // Appliquer des propriétés spécifiques selon le type de matériau
-              if (material instanceof THREE.MeshStandardMaterial) {
-                // Propriétés spécifiques au matériau standard
-                material.roughness = 0.1;
-                material.metalness = 0.2;
-              }
-              
-              if (material instanceof THREE.MeshPhongMaterial) {
-                // Propriétés spécifiques au matériau phong
-                material.shininess = 100;
-                material.specular = new THREE.Color(0xffffff);
-              }
-              
-              // Ajouter une légère teinte bleutée pour l'effet verre
-              // Utiliser une couleur légèrement bleutée pour l'effet verre
-              const glassColor = new THREE.Color(0xc4e0f9); // Bleu très pâle
-              material.color.lerp(glassColor, 0.7); // Mélanger avec la couleur existante
-            } else {
-              // Pour les autres matériaux (structure), les garder opaques
-              material.transparent = false;
-              material.opacity = 1.0;
-            }
-          }
-        };
-        
-        // Appliquer aux matériaux
-        if (child.material instanceof THREE.Material) {
-          applyGlassEffect(child.material);
+        // Vérifier si le mesh utilise le matériau cible
+        if (child.material instanceof THREE.Material && 
+            materials && 
+            child.material.name === '0.917647_0.917647_0.917647_0.000000_0.800000') {
+          // Déjà traité ci-dessus
         } else if (Array.isArray(child.material)) {
+          // Pour les meshes avec plusieurs matériaux
           child.material.forEach(mat => {
-            if (mat instanceof THREE.Material) {
-              applyGlassEffect(mat);
+            if (mat instanceof THREE.Material && 
+                materials && 
+                mat.name === '0.917647_0.917647_0.917647_0.000000_0.800000') {
+              // Déjà traité ci-dessus
             }
           });
         }
