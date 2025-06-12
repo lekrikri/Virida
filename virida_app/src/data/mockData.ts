@@ -333,42 +333,42 @@ export const mockSensors: SensorData[] = [
     id: 'temp1',
     type: 'temperature',
     value: 23.5,
-    position: [-2, 1, -2],
+    position: [-0.8, 0.8, -0.8],
     zone: 'zone1'
   },
   {
     id: 'temp2',
     type: 'temperature',
     value: 24.2,
-    position: [2, 1, -2],
+    position: [0.8, 0.8, -0.8],
     zone: 'zone2'
   },
   {
     id: 'hum1',
     type: 'humidity',
     value: 65,
-    position: [-2, 1, 2],
+    position: [-0.8, 0.8, 0.8],
     zone: 'zone1'
   },
   {
     id: 'hum2',
     type: 'humidity',
     value: 68,
-    position: [2, 1, 2],
+    position: [0.8, 0.8, 0.8],
     zone: 'zone2'
   },
   {
     id: 'co2_1',
     type: 'co2',
     value: 450,
-    position: [0, 2, 0],
+    position: [0, -0.1, 0],
     zone: 'zone1'
   },
   {
     id: 'light1',
     type: 'light',
     value: 75,
-    position: [0, 3, 0],
+    position: [0, 1, 0],
     zone: 'zone2'
   }
 ];

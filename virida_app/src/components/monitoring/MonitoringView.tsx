@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Suspense } from 'react';
 import { Box, Typography, IconButton, Chip, Paper, styled } from '@mui/material';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, useGLTF, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { useViridaStore } from '../../store/useViridaStore';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
@@ -42,69 +42,170 @@ const SensorTooltip = styled(Paper)(({ theme }) => ({
   pointerEvents: 'none',
 }));
 
+// Chemin relatif au fichier GLTF
+const serreModelPath = new URL('../3d/Serre_max.gltf', import.meta.url).href;
+
+// Composant pour le modèle 3D de la serre
+const SerreModel = () => {
+  const { scene, materials } = useGLTF(serreModelPath);
+  
+  useEffect(() => {
+    // Configuration pour les reflets
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(1, 1); // Taille minimale pour éviter les erreurs
+    
+    // Appliquer l'effet plexiglas/verre uniquement au matériau spécifique
+    if (materials && materials['0.917647_0.917647_0.917647_0.000000_0.800000']) {
+      const glassMaterial = materials['0.917647_0.917647_0.917647_0.000000_0.800000'];
+      
+      // Appliquer l'effet plexiglas/verre
+      glassMaterial.transparent = true;
+      glassMaterial.opacity = 0.10; // Très transparent
+      
+      // Appliquer des propriétés spécifiques selon le type de matériau
+      if (glassMaterial instanceof THREE.MeshStandardMaterial) {
+        glassMaterial.roughness = 0.05; // Très lisse
+        glassMaterial.metalness = 0.2; // Légèrement métallique
+        glassMaterial.envMapIntensity = 1.8; // Intensifier les reflets
+        
+        // Ajouter une légère teinte bleutée pour l'effet verre
+        const glassColor = new THREE.Color(0xc4e0f9); // Bleu très pâle
+        glassMaterial.color.lerp(glassColor, 0.5); // Mélanger avec la couleur existante
+      }
+      
+      if (glassMaterial instanceof THREE.MeshPhongMaterial) {
+        glassMaterial.shininess = 100;
+        glassMaterial.specular = new THREE.Color(0xffffff);
+        
+        // Ajouter une légère teinte bleutée pour l'effet verre si c'est un matériau Phong
+        // Vérification de type plus précise pour éviter l'erreur TypeScript
+        if ('color' in glassMaterial && glassMaterial.color instanceof THREE.Color) {
+          const glassColor = new THREE.Color(0xc4e0f9); // Bleu très pâle
+          glassMaterial.color.lerp(glassColor, 0.5); // Mélanger avec la couleur existante
+        }
+      }
+    }
+    
+    // Nettoyer le renderer
+    renderer.dispose();
+    
+    // Centrer le modèle en calculant sa boîte englobante
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    
+    // Ajuster la position du modèle pour que son centre soit à l'origine
+    scene.position.x = -center.x;
+    scene.position.y = -center.y;
+    scene.position.z = -center.z;
+    
+    // Ajuster l'échelle pour qu'elle corresponde à la taille de la scène existante
+    // Une échelle plus grande pour que la serre soit bien visible
+    scene.scale.set(2.2, 2.2, 2.2);
+    
+    // Positionner le modèle pour que les capteurs soient à l'intérieur
+    scene.position.y = 0.4;
+  }, [scene, materials]);
+
+  return <primitive object={scene} position={[-0.02, 2, 0]} />;
+};
+
 // Composant pour la scène 3D
 const Scene = () => {
   const { sensors, zones } = useViridaStore();
   const [hoveredSensor, setHoveredSensor] = useState<any>(null);
 
-  // Créer les géométries des capteurs
+  // Créer les géométries des capteurs (plus petites pour mieux s'intégrer dans la serre)
   const sensorGeometries = {
-    temperature: new THREE.SphereGeometry(0.2),
-    humidity: new THREE.BoxGeometry(0.3, 0.3, 0.3),
-    co2: new THREE.CylinderGeometry(0.15, 0.15, 0.4),
-    light: new THREE.ConeGeometry(0.2, 0.4),
+    temperature: new THREE.SphereGeometry(0.1),
+    humidity: new THREE.BoxGeometry(0.15, 0.15, 0.15),
+    co2: new THREE.CylinderGeometry(0.08, 0.08, 0.2),
+    light: new THREE.ConeGeometry(0.1, 0.2),
   };
 
-  // Créer les matériaux des capteurs
+  // Créer les matériaux des capteurs avec des propriétés améliorées pour une meilleure visibilité
   const sensorMaterials = {
-    temperature: new THREE.MeshStandardMaterial({ color: '#e74c3c' }),
-    humidity: new THREE.MeshStandardMaterial({ color: '#3498db' }),
-    co2: new THREE.MeshStandardMaterial({ color: '#2ecc71' }),
-    light: new THREE.MeshStandardMaterial({ color: '#f1c40f' }),
+    temperature: new THREE.MeshStandardMaterial({ 
+      color: '#e74c3c', 
+      emissive: '#e74c3c', 
+      emissiveIntensity: 0.3,
+      roughness: 0.3,
+      metalness: 0.7
+    }),
+    humidity: new THREE.MeshStandardMaterial({ 
+      color: '#3498db', 
+      emissive: '#3498db', 
+      emissiveIntensity: 0.3,
+      roughness: 0.3,
+      metalness: 0.7
+    }),
+    co2: new THREE.MeshStandardMaterial({ 
+      color: '#2ecc71', 
+      emissive: '#2ecc71', 
+      emissiveIntensity: 0.3,
+      roughness: 0.3,
+      metalness: 0.7
+    }),
+    light: new THREE.MeshStandardMaterial({ 
+      color: '#f1c40f', 
+      emissive: '#f1c40f', 
+      emissiveIntensity: 0.3,
+      roughness: 0.3,
+      metalness: 0.7
+    }),
   };
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 5, 10]} />
+      <PerspectiveCamera makeDefault position={[0, 2, 5]} />
       <OrbitControls enableDamping dampingFactor={0.05} />
       
       {/* Ambient Light */}
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.8} />
       
       {/* Directional Light */}
-      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <directionalLight 
+        position={[10, 10, 5]} 
+        intensity={1} 
+        castShadow 
+        shadow-mapSize-width={1024} 
+        shadow-mapSize-height={1024} 
+      />
+      <pointLight position={[5, 5, 5]} intensity={0.8} castShadow />
+      <pointLight position={[-5, 5, -5]} intensity={0.6} castShadow color="#f0f8ff" />
       
-      {/* Greenhouse Base */}
-      <mesh position={[0, -0.5, 0]} receiveShadow>
-        <boxGeometry args={[10, 0.1, 10]} />
-        <meshStandardMaterial color="#f5f5f5" />
-      </mesh>
-
-      {/* Greenhouse Walls */}
-      <mesh position={[0, 2, 0]}>
-        <boxGeometry args={[10, 4, 10]} />
-        <meshStandardMaterial color="#f5f5f5" transparent opacity={0.3} />
-      </mesh>
+      {/* Environment pour les reflets */}
+      <Environment preset="sunset" />
       
-      {/* Sensors */}
-      {sensors.map((sensor, index) => (
-        <mesh
-          key={sensor.id}
-          position={sensor.position}
-          geometry={sensorGeometries[sensor.type as keyof typeof sensorGeometries]}
-          material={sensorMaterials[sensor.type as keyof typeof sensorMaterials]}
-          onPointerOver={() => setHoveredSensor(sensor)}
-          onPointerOut={() => setHoveredSensor(null)}
-        />
-      ))}
+      {/* Modèle 3D de la serre */}
+      <Suspense fallback={null}>
+        <SerreModel />
+      </Suspense>
+      
+      {/* Sensors - Utilisation directe des positions définies dans mockData.ts */}
+      {sensors.map((sensor, index) => {
+        // Réduire la taille des capteurs pour qu'ils s'intègrent mieux dans la serre
+        const sensorScale = 0.8;
+        
+        // Utiliser directement la position définie dans les données du capteur
+        // Cela permet de personnaliser la position de chaque capteur dans le fichier mockData.ts
+        return (
+          <mesh
+            key={sensor.id}
+            position={sensor.position}
+            geometry={sensorGeometries[sensor.type as keyof typeof sensorGeometries]}
+            material={sensorMaterials[sensor.type as keyof typeof sensorMaterials]}
+            onPointerOver={() => setHoveredSensor(sensor)}
+            onPointerOut={() => setHoveredSensor(null)}
+            scale={[sensorScale, sensorScale, sensorScale]}
+            // Ajouter une légère rotation pour plus de dynamisme
+            rotation={[0, Math.PI * (index * 0.25), 0]}
+            // Ajouter des ombres pour une meilleure intégration visuelle
+            castShadow
+          />
+        );
+      })}
 
-      {/* Zones */}
-      {zones.map((zone) => (
-        <mesh key={zone.id} position={zone.position}>
-          <boxGeometry args={zone.dimensions} />
-          <meshStandardMaterial color="#2AD388" transparent opacity={0.1} />
-        </mesh>
-      ))}
+      {/* Zones - Supprimées pour ne garder que la serre GLTF */}
     </>
   );
 };
@@ -134,7 +235,7 @@ const MonitoringView: React.FC = () => {
       </Box>
 
       <StyledBox onMouseMove={handleMouseMove}>
-        <Canvas ref={canvasRef}>
+        <Canvas ref={canvasRef} shadows>
           <Scene />
         </Canvas>
 
