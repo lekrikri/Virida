@@ -1,0 +1,386 @@
+{
+  "name": "ChatBot EVE - RAG Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot-eve",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:3000,http://localhost:5173"
+        }
+      },
+      "id": "webhook-chat-input",
+      "name": "Webhook Chat Input",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "webhookId": "chatbot-eve-input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.message}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "user_question",
+              "name": "user_question",
+              "value": "={{$json.body.message}}",
+              "type": "string"
+            },
+            {
+              "id": "sensor_data",
+              "name": "sensor_data",
+              "value": "={{$json.body.sensorData || {}}}",
+              "type": "object"
+            },
+            {
+              "id": "user_id",
+              "name": "user_id",
+              "value": "={{$json.body.userId || 'anonymous'}}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{new Date().toISOString()}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "prepare-rag-request",
+      "name": "Prepare RAG Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [600, 220]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/ask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{$json.user_question}}"
+            },
+            {
+              "name": "stream",
+              "value": false
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "call-rag-api",
+      "name": "Call RAG API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [800, 220]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$responseCode}}",
+              "value2": 200,
+              "operation": "equal"
+            }
+          ]
+        }
+      },
+      "id": "check-rag-success",
+      "name": "Check RAG Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1000, 220]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eve_response",
+              "name": "eve_response",
+              "value": "={{$json.answer}}",
+              "type": "string"
+            },
+            {
+              "id": "response_method",
+              "name": "response_method",
+              "value": "={{$json.method}}",
+              "type": "string"
+            },
+            {
+              "id": "sources_count",
+              "name": "sources_count",
+              "value": "={{$json.sources ? $json.sources.length : 0}}",
+              "type": "number"
+            },
+            {
+              "id": "processing_time",
+              "name": "processing_time",
+              "value": "={{new Date().toISOString()}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "format-success-response",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [1200, 160]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eve_response",
+              "name": "eve_response",
+              "value": "Désolée, je rencontre une difficulté technique. Pouvez-vous répéter votre question ? En attendant, je peux vous aider avec des conseils généraux sur votre serre ! 🌱",
+              "type": "string"
+            },
+            {
+              "id": "response_method",
+              "name": "response_method",
+              "value": "fallback",
+              "type": "string"
+            },
+            {
+              "id": "error_info",
+              "name": "error_info",
+              "value": "={{$json.error || 'RAG API unavailable'}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "format-fallback-response",
+      "name": "Format Fallback Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [1200, 280]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "final_response",
+              "name": "final_response",
+              "value": "={{$json.eve_response}}",
+              "type": "string"
+            },
+            {
+              "id": "metadata",
+              "name": "metadata",
+              "value": "={{ { method: $json.response_method, sources: $json.sources_count || 0, timestamp: $json.processing_time || new Date().toISOString() } }}",
+              "type": "object"
+            },
+            {
+              "id": "sender",
+              "name": "sender",
+              "value": "eve",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "merge-responses",
+      "name": "Merge Responses",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [1400, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"response\": $json.final_response, \"sender\": $json.sender, \"metadata\": $json.metadata } }}"
+      },
+      "id": "webhook-chat-response",
+      "name": "Webhook Chat Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"error\": \"Message invalide ou vide\", \"response\": \"Pouvez-vous reformuler votre question ? Je suis là pour vous aider ! 🤖\" } }}"
+      },
+      "id": "error-invalid-input",
+      "name": "Error Invalid Input",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [600, 380]
+    }
+  ],
+  "connections": {
+    "Webhook Chat Input": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Prepare RAG Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Invalid Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare RAG Request": {
+      "main": [
+        [
+          {
+            "node": "Call RAG API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call RAG API": {
+      "main": [
+        [
+          {
+            "node": "Check RAG Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check RAG Success": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Fallback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Merge Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Fallback Response": {
+      "main": [
+        [
+          {
+            "node": "Merge Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Responses": {
+      "main": [
+        [
+          {
+            "node": "Webhook Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-09-28T13:30:00.000Z",
+      "updatedAt": "2025-09-28T13:30:00.000Z",
+      "id": "chatbot",
+      "name": "chatbot"
+    },
+    {
+      "createdAt": "2025-09-28T13:30:00.000Z",
+      "updatedAt": "2025-09-28T13:30:00.000Z",
+      "id": "rag",
+      "name": "rag"
+    },
+    {
+      "createdAt": "2025-09-28T13:30:00.000Z",
+      "updatedAt": "2025-09-28T13:30:00.000Z",
+      "id": "virida",
+      "name": "virida"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-09-28T13:30:00.000Z",
+  "versionId": "1"
+}
