@@ -153,9 +153,8 @@ def _do_stop_and_transcribe():
             audio,
             language="fr",
             beam_size=5,
-            vad_filter=True,
-            vad_parameters={"threshold": 0.3},
-            no_speech_threshold=0.4,
+            vad_filter=False,
+            no_speech_threshold=0.9,
             initial_prompt="Bonjour, voici une transcription en français pour l'application Virida.",
         )
         text = " ".join(seg.text for seg in segments).strip()
