@@ -132,7 +132,14 @@ def _do_stop_and_transcribe():
 
         audio = np.concatenate(_audio_chunks, axis=0).flatten().astype(np.float32)
         duration = round(len(audio) / SAMPLE_RATE, 2)
-        log.info(f"Audio capturé : {duration}s, RMS={np.sqrt(np.mean(audio**2)):.4f}")
+        rms = float(np.sqrt(np.mean(audio ** 2)))
+        log.info(f"Audio capturé : {duration}s, RMS={rms:.6f}")
+
+        # Normaliser si signal trop faible (micro éloigné, gain insuffisant)
+        if rms > 1e-6:
+            target_rms = 0.05
+            audio = audio * (target_rms / rms)
+            log.info(f"Normalisé : gain x{target_rms/rms:.1f}, RMS→{target_rms}")
 
         # Rééchantillonner 44100 Hz → 16000 Hz pour Whisper
         g = gcd(WHISPER_RATE, SAMPLE_RATE)
@@ -146,7 +153,9 @@ def _do_stop_and_transcribe():
             audio,
             language="fr",
             beam_size=5,
-            vad_filter=False,
+            vad_filter=True,
+            vad_parameters={"threshold": 0.3},
+            no_speech_threshold=0.4,
             initial_prompt="Bonjour, voici une transcription en français pour l'application Virida.",
         )
         text = " ".join(seg.text for seg in segments).strip()
