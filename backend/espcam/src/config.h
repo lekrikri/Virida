@@ -15,7 +15,7 @@ static const int WIFI_NETWORK_COUNT = 2;
 static const int WIFI_TIMEOUT_MS    = 15000;
 
 // --- MQTT ---
-#define MQTT_BROKER   "10.38.24.32"   // IP locale du Pi dans le réseau serre
+#define MQTT_BROKER   "192.168.0.107"  // IP locale du Pi dans le réseau serre
 #define MQTT_PORT     1883
 #define MQTT_USER     "virida"
 #define MQTT_PASSWORD "virida123"
