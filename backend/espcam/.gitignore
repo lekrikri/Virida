@@ -1,0 +1,4 @@
+.pio/
+*.Zone.Identifier
+# config.h contient les mots de passe — ne pas committer si secrets remplis
+# src/config.h
