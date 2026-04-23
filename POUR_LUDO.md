@@ -121,12 +121,13 @@ ESPCAM_SNAPSHOT_URL=http://192.168.0.100/capture
 ### Moyen terme
 4. **Tests benchmark EVE** : relancer `benchmark_eve_contexte.py` — objectif 90%+ (actuel 83%)
 5. **Hybrid search chunks** : `chunks_v3.json` a 174 chunks mais le BM25 ne charge que `chunks.json` (90 chunks) → unifier
-6. **Vision trigger** : ajuster le seuil de déclenchement `VisionTrigger.should_analyze()` selon les besoins réels
-7. **Déploiement Clever Cloud** : `VLM_MODEL=smolvlm` (SmolVLM-500M) car pas de mmproj Gemma sur Clever
+6. **Déploiement Clever Cloud** : `VLM_MODEL=smolvlm` (SmolVLM-500M) car le mmproj Gemma (~1 GB) ne rentrera pas sur Clever Cloud plan M
 
 ### Long terme
-8. **Onboarding personnalisé** : adapter le message selon le profil user (admin vs user)
-9. **EVE voix** : TTS pour que Eve puisse parler (piper-tts)
+7. **Onboarding personnalisé** : adapter le message selon le profil user (admin vs user)
+8. **EVE voix** : TTS pour que Eve puisse parler (piper-tts)
+
+> ✅ **Vision Pi5 = TERMINÉE** — Gemma 4 E2B + mmproj-BF16.gguf opérationnel, pipeline MQTT→VLM→EVE actif.
 
 ---
 
