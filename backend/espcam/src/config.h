@@ -8,14 +8,15 @@
 // --- WiFi (ordre de priorité) ---
 struct WifiNetwork { const char* ssid; const char* password; };
 static const WifiNetwork WIFI_NETWORKS[] = {
-  { "4G-CPE-ADC1", "12345678" },  // réseau serre (principal)
-  { "Krikri",      "REMPLACER" }, // réseau dev backup
+  { "Krikri",      "fanfan_gwada_971" }, // Hotspot téléphone (actuel)
+  { "4G-CPE-ADC1", "12345678" },         // Box 4G (réseau définitif)
 };
 static const int WIFI_NETWORK_COUNT = 2;
 static const int WIFI_TIMEOUT_MS    = 15000;
 
 // --- MQTT ---
-#define MQTT_BROKER   "192.168.0.107"  // IP locale du Pi dans le réseau serre
+// IP fixe du Pi sur le réseau 4G-CPE-ADC1 (mDNS peu fiable sur router 4G)
+#define MQTT_BROKER   "192.168.0.107"
 #define MQTT_PORT     1883
 #define MQTT_USER     "virida"
 #define MQTT_PASSWORD "virida123"
