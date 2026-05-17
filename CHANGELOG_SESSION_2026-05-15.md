@@ -117,12 +117,83 @@ Déploiement : `_ensure_vision_columns` ajoute la colonne `spectral_indices JSON
 
 ---
 
+### 7. Vision — Segmentation pixel-par-pixel (masque feuilles)
+
+Modification de `vision_cv_analyzer.py` — tous les indices spectraux sont maintenant calculés **uniquement sur les pixels feuilles** (pas le fond, pot, terre, mur).
+
+- Masque HSV multi-couche : vert sain (H 15-95) + brun nécrose (H 8-22) + morphologie close/open
+- Helper `_masked_mean(arr2d)` : moyenne sur `arr[mask_bool]` si >100 pixels végétaux, sinon fallback global
+- Nouveau champ `leaf_pixel_ratio` : fraction de pixels dans le masque (indicateur qualité segmentation)
+- Gain : ExG, VARI, NGRDI etc. ne sont plus "pollués" par les pixels de fond → diagnostics plus précis
+
+### 8. Active Learning — Margin Sampling
+
+Modification de `yolo_plant_analyzer.py` :
+
+| Nouveau champ | Formule | Interprétation |
+|--------------|---------|----------------|
+| `_yolo_margin` | `top1_prob - top2_prob` | 0 = très incertain, 1 = certain |
+| `_yolo_top2_class` | 2e classe la plus probable | utile pour comprendre les confusions |
+| `_yolo_top2_prob` | probabilité du 2e candidat | — |
+| `_yolo_entropy` | entropie de la distribution | mesure d'incertitude globale |
+
+Modification de `log_low_confidence_image()` :
+- Stocke `margin_score`, `uncertainty` (0→1), `yolo_entropy`, `yolo_top2` dans `metadata.json`
+- `uncertainty = 1 - margin` si YOLO dispo, sinon déduit de `confidence` LLM
+
+Nouveaux endpoints :
+- **`GET /vision/active-learning-queue`** : retourne les images triées par `uncertainty DESC` — les annotateurs savent lesquelles traiter en priorité
+- **`POST /vision/active-learning-annotate`** : marquer une image avec son label correct (`healthy`/`stressed`/`diseased`/`discard`)
+
+### 9. Species Detector — K-NN spectral zéro-shot (`species_detector.py`)
+
+Nouveau module `eve/vision/species_detector.py` — classification d'espèce **sans CLIP ni modèle lourd** (~0 MB supplémentaire).
+
+**Principe** : distance euclidienne pondérée dans l'espace des 11 features spectrales :
+
+| Feature | Poids | Rôle |
+|---------|-------|------|
+| `exg_index` | 2.0 | Intensité chlorophylle |
+| `vari_index` | 2.0 | Végétation robuste |
+| `gli_index` | 1.5 | Complémentaire ExG |
+| `ngrdi_index` | 1.5 | Ratio vert/rouge |
+| `lbp_entropy` | 1.5 | Texture (distingue feuilles lisses vs frisées) |
+| `hue_entropy` | 1.5 | Palette teintes (fraise = mélange vert/rouge) |
+| `exr_index` | 1.0 | Excès rouge |
+| `chlorosis_index` | 1.0 | Rapport R/G |
+| `avg_saturation` | 0.5 | Brillance (basilic = très saturé) |
+| `green_ratio` | 1.0 | — |
+| `yellow_ratio` | 0.8 | — |
+
+**8 espèces couvertes** : basilic génois, tomate cerise, laitue beurre, menthe, fraise, persil frisé, épinard, coriandre.
+
+**Auto-détection** : si `plant_name` est générique ("plante", vide), l'espèce est détectée avant l'analyse VLM et injectée automatiquement dans le pipeline.
+
+**Apprentissage en ligne** : `update_profile(species, cv, weight=0.05)` — EWMA sur les analyses high-confidence pour adapter les profils aux conditions réelles de la serre.
+
+**Réponse enrichie** : le champ `species_detected` est ajouté à la réponse `/vision/analyze` quand l'auto-détection est activée.
+
+---
+
+## Déploiements
+
+| Service | Méthode | Commit |
+|---------|---------|--------|
+| `virida_app` (Clever Cloud) | `git push clever master` | `92a932b` |
+| `virida-eve` (Pi 5) | `scp` direct + `systemctl restart` | `64281a3` |
+| `virida-eve` (Clever Cloud) | `git push viridaapirag master --force` | `5a040f0` |
+| `virida-eve` (Pi 5) | `scp` direct + `systemctl restart` | `eb2b9ab` |
+| `virida-eve` (Clever Cloud) | `git push viridaapirag master` | `eb2b9ab` |
+| `virida-eve` (Pi 5) | `scp` direct + `systemctl restart` | `6de8346` |
+| `virida-eve` (Clever Cloud) | `git push viridaapirag master` | `6de8346` |
+
+---
+
 ## Reste à faire (backlog)
 
 - **GraphRAG / Hierarchical RAG** : relations causales entre entités agronomes (long terme)
 - **Mode Ultra-simple** : sélectionnable par l'utilisateur dans l'interface (format Problème → Cause → Action → Surveillance)
 - **A/B testing + feedback thumbs** : évaluation réelle utilisateur (taux d'abandon, satisfaction)
 - **Calibration capteurs** : rappel mensuel EVE pour recalibration avec solution tampon
-- **BioCLIP/K-NN** : classification espèce zero-shot (priorité réduite — VLM-first couvre déjà)
-- **YOLO-seg segmentation** : YOLOv8n-seg pour isoler uniquement les pixels feuilles (effort élevé)
-- **Active Learning margin sampling** : `top1_prob - top2_prob` pour prioriser les images incertaines à annoter
+- **YOLO-seg instance segmentation** : YOLOv8n-seg réel avec modèle PlantVillage-seg (long terme, modèle non disponible publiquement)
+- **Species detector — calibration** : collecter des images réelles par espèce pour affiner les profils K-NN
