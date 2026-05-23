@@ -342,7 +342,10 @@ QUESTIONS = [
 
     {"id": "V62", "cat": "croissance",
      "q": "comment faire pousser ma salade plus vite dans la serre ?",
-     "kw": ["lumière", "ph", "température", "nutriment", "croissance"], "scope": True},
+     "kw": ["laitue", "serre", "ajouter", "cultivez"],
+     "kw_absent": ["ph 4", "19.17"],
+     "scope": True,
+     "note": "Salade pas dans la serre — EVE doit le signaler et proposer de l'ajouter"},
 
     {"id": "V63", "cat": "croissance",
      "q": "je veux des fraises rapidement, que faire ?",
