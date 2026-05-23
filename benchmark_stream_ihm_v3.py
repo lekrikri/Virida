@@ -43,9 +43,10 @@ STREAM_TIMEOUT  = 60
 # Valeurs inventées = hallucination prouvée
 HALLUC_PATTERNS = [
     r'\bpH\s*[:\s]*6\.0\b', r'\bph\s*[:\s]*6\b(?!\.\d)',
-    r'\bTDS\s*[:\s]*287\b', r'\btempérature\s*[:\s]*25\s*°?[Cc]\b(?!.*capteur)',
+    r'\btempérature\s*[:\s]*25\s*°?[Cc]\b(?!.*capteur)',
     r'\bhumidité\s*[:\s]*100\s*%.*optimal',
     r'Enserreuse',  # hallucination connue Qwen
+    # NOTE: TDS 287 retiré — c'est une vraie valeur de la serre krikri@virida.com
 ]
 
 # ─── Questions ────────────────────────────────────────────────────────────────
