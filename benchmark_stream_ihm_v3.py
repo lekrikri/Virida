@@ -345,7 +345,10 @@ QUESTIONS = [
 
     {"id": "V63", "cat": "croissance",
      "q": "je veux des fraises rapidement, que faire ?",
-     "kw": ["ph", "lumière", "nutriment", "croissance", "fraise"], "scope": True},
+     "kw": ["fraise", "serre", "ajouter", "cultivez"],
+     "kw_absent": ["ph 4", "19.17", "lux"],
+     "scope": True,
+     "note": "EVE doit signaler que fraise n'est pas dans la serre — ne pas appliquer les données capteurs"},
 
     {"id": "V64", "cat": "croissance",
      "q": "mes tomates cerises grandissent pas assez vite, c'est le pH ?",
@@ -551,7 +554,8 @@ def evaluate(answer, q, latency):
             "mentions_real_ph": False, "kw_hit": 0, "kw_hits": [],
         }
 
-    useful   = len(kw_hits) > 0 and len(answer) > 25 and not generic
+    kw_absent_fail = any(kw.lower() in a for kw in q.get("kw_absent", []))
+    useful   = len(kw_hits) > 0 and len(answer) > 25 and not generic and not kw_absent_fail
     det      = latency <= 1.5
     action   = bool(re.search(
         r'\b(ajout|corriger|arros|traiter|vérifi|activ|augment|diminu'
