@@ -181,7 +181,7 @@ QUESTIONS = [
     # ══════════════════════════════════════════════════════════════════════
     {"id": "V28", "cat": "implicit",
      "q": "est-ce normal que mes feuilles soient toutes molles ?",
-     "kw": ["humidité", "arros", "sol", "mou", "fletr"], "scope": True},
+     "kw": ["caméra", "symptôme", "visuel", "feuille", "diagnostic"], "scope": True},
 
     {"id": "V29", "cat": "implicit",
      "q": "pourquoi mes tomates poussent pas vite ?",
