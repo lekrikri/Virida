@@ -542,7 +542,9 @@ def evaluate(answer, q, latency):
 
     # Pour offtopic, utile = refus poli (pas de contenu hors périmètre)
     if not q.get("scope", True):
-        useful = generic or bool(re.search(r'p[eé]rim[eè]tre|hors\s*(sujet|scope)|ne\s*(pas|peux)', a))
+        useful = bool(re.search(
+            r'p[eé]rim[eè]tre|hors\s*(sujet|scope|domaine|comp[eé]tence)|ne\s*(pas|peux)|'
+            r'sp[eé]cialis[eé]|serre|culture|jardinage|je\s+suis\s+eve', a))
         return {
             "useful": useful, "deterministic": latency <= 1.5, "hallucination": halluc,
             "actionnable": False, "generic": True,
