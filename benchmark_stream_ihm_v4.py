@@ -200,7 +200,7 @@ QUESTIONS = [
     # ══════════════════════════════════════════════════════════════════════
     {"id": "W37", "cat": "recolte",
      "q": "comment conserver mes tomates cerises après la récolte ?",
-     "kw": ["tomate", "conservation", "ambiant", "réfrigér", "24", "48"], "scope": True},
+     "kw": ["tomate", "conservation", "ambiant", "réfrigér", "3", "5"], "scope": True},
 
     {"id": "W38", "cat": "recolte",
      "q": "quand récolter le poivron vert et le poivron rouge ?",
