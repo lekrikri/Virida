@@ -605,7 +605,19 @@ def main():
     token = login(args.url, args.email, args.password)
     if not token:
         print("ÉCHEC"); sys.exit(1)
-    print("OK ✅\n")
+    print("OK ✅")
+
+    # Warm-up actif : attendre qu'EVE soit complètement initialisé (LLM chargé)
+    print("⏳ Warm-up EVE (attente LLM prêt)...", flush=True)
+    for attempt in range(15):
+        ans, _, _ = call_stream(args.url, token, "ça va ?")
+        if ans and "démarre" not in ans and len(ans) > 15:
+            print(f"✅ EVE warm ({attempt+1} essai{'s' if attempt>0 else ''}) — début benchmark\n")
+            break
+        print(f"  [{attempt+1}/15] EVE pas encore prêt... 10s", flush=True)
+        import time as _t; _t.sleep(10)
+    else:
+        print("⚠️ EVE peut ne pas être chaud — lancement quand même\n")
 
     questions = QUESTIONS
     if args.cat:
