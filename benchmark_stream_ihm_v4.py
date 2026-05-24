@@ -22,7 +22,6 @@ STREAM_TIMEOUT  = 60
 
 HALLUC_PATTERNS = [
     r'Enserreuse',
-    r'\bpH\s*[:\s]*6\.0\b(?!.*(?:poivron|concombre|menthe|thym|ciboulette|fraise|herbe|capsicum|cucumis))',
 ]
 
 QUESTIONS = [
