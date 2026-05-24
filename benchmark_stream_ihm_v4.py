@@ -101,11 +101,11 @@ QUESTIONS = [
     # ══════════════════════════════════════════════════════════════════════
     {"id": "W16", "cat": "herbes",
      "q": "comment cultiver de la menthe dans ma serre ?",
-     "kw": ["menthe", "pot", "humide", "lux", "ph"], "scope": True},
+     "kw": ["menthe", "humide", "lux", "ph"], "scope": True},
 
     {"id": "W17", "cat": "herbes",
      "q": "mon thym ne pousse pas bien dans la serre",
-     "kw": ["thym", "soleil", "drainage", "sécheresse", "lux"], "scope": True},
+     "kw": ["thym", "soleil", "drain", "sécheresse", "lux"], "scope": True},
 
     {"id": "W18", "cat": "herbes",
      "q": "comment faire pousser de la ciboulette en serre hydroponique ?",
@@ -124,7 +124,7 @@ QUESTIONS = [
     # ══════════════════════════════════════════════════════════════════════
     {"id": "W21", "cat": "stades_tomate",
      "q": "ma tomate cerise est au stade semis, que faire ?",
-     "kw": ["seedling", "semis", "400", "800", "tds", "lumière", "18"], "scope": True},
+     "kw": ["semis", "400", "800", "tds", "lumière", "18"], "scope": True},
 
     {"id": "W22", "cat": "stades_tomate",
      "q": "ma tomate est en phase végétative, quel TDS et NPK ?",
