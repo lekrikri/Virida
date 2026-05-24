@@ -136,7 +136,7 @@ QUESTIONS = [
 
     {"id": "W24", "cat": "stades_tomate",
      "q": "mes tomates cerises commencent à former des fruits, que faire ?",
-     "kw": ["fructification", "fruiting", "tds", "2000", "arrosage", "régulier"], "scope": True},
+     "kw": ["fructification", "tds", "2000", "arrosage", "régulier"], "scope": True},
 
     {"id": "W25", "cat": "stades_tomate",
      "q": "quand récolter mes tomates cerises ?",
